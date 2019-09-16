@@ -46,7 +46,8 @@ namespace StudentNetwork.Controllers
         {
             if (ModelState.IsValid)
             {
-                Student user = await db.Students.FirstOrDefaultAsync(u => u.Login == model.Login && u.Password == model.Password);
+                model.Password = Student.Hash(model.Password);
+                Student user = await db.Students.FirstOrDefaultAsync(u => u.Login == model.Login && u.PasswordHash == model.Password);
                 if (user != null)
                 {
                     await Authenticate(model.Login);
@@ -73,7 +74,7 @@ namespace StudentNetwork.Controllers
                     db.Students.Add(new Student
                     {
                         Login = model.Login,
-                        Password = model.Password,
+                        PasswordHash = Student.Hash(model.Password),
                         FirstName = model.FirstName,
                         LastName = model.LastName,
                     });

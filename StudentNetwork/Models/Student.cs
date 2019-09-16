@@ -1,8 +1,10 @@
-﻿using System;
+﻿using System.Text;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
+using System;
 
 namespace StudentNetwork.Models
 {
@@ -14,7 +16,13 @@ namespace StudentNetwork.Models
         public string LastName { get; set; }
         public string Name => $"{FirstName} {LastName}";
         public string Login { get; set; }
-        public string Password { get; set; }
+        public string PasswordHash { get; set; }
         public Group Group { get; set; }
+
+        static public string Hash(string password)
+        {
+            var hash = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(hash);
+        }
     }
 }
