@@ -38,11 +38,11 @@
                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Мои документы</a></li>
                 </ul>
 
-                <div class="nav navbar-nav navbar-right media-middle">
+                <ul class="nav navbar-nav navbar-right media-middle">
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <div class="dropdown">
-                            <button class="btn dropdown-toggle drop-button" data-toggle="dropdown">
+                        <li class="dropdown">
+                            <button class="btn navbar-btn dropdown-toggle" data-toggle="dropdown">
                                 @await Component.InvokeAsync("Name")
                                 <span class="caret"></span>
                             </button>
@@ -51,13 +51,14 @@
                                 <li><a asp-area="" asp-controller="Account" asp-action="Edit">Редактировать</a></li>
                                 <li><a asp-area="" asp-controller="Account" asp-action="Logout">Выйти</a></li>
                             </ul>
-                        </div>
+                        </li>
                     }
                     else
                     {
-                        <a asp-area="" asp-controller="Account" asp-action="Login">Войти</a>
+                        <li><a asp-area="" asp-controller="Account" asp-action="Login">Вход</a></li>
+                        <li><a asp-area="" asp-controller="Account" asp-action="Register">Регистрация</a></li>
                     }
-                </div>
+                </ul>
             </div>
         </div>
     </nav>
