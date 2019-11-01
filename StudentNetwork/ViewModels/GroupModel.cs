@@ -4,15 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace StudentNetwork.Models
+namespace StudentNetwork.ViewModels
 {
-    public class Group
+    public class GroupModel
     {
-        [Key]
-        public int Id { get; set; }
+        [Required(ErrorMessage = "Не указан номер группы")]
         public uint Number { get; set; }
         public string Name { get; set; }
-        public Chat Chat { get; set; } = new Chat();
-        public ICollection<Student> Students { get; set; } = new List<Student>();
+        [Key]
+        public int Id { get; set; }
     }
 }

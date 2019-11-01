@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace StudentNetwork.ViewModels
 {
     public class LoginModel
     {
         [Required(ErrorMessage = "Не указан логин")]
+        [Remote("IsExist", "Account", ErrorMessage = "Логин занят")]
         public string Login { get; set; }
 
         [Required(ErrorMessage = "Не указан пароль")]

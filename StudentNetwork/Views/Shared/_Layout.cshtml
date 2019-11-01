@@ -7,7 +7,9 @@
 
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-theme.css" />
         <link rel="stylesheet" href="~/css/site.css" />
+        <link rel="stylesheet" href="~/css/menu.css" />
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
@@ -30,17 +32,37 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
-                    <li><a asp-area="" asp-controller="Account" asp-action="Logout">Выйти</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Моя страница</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="About">Мои друзья</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Моя группа</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Мои документы</a></li>
                 </ul>
+
+                <div class="nav navbar-nav navbar-right media-middle">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div class="dropdown">
+                            <button class="btn dropdown-toggle drop-button" data-toggle="dropdown">
+                                @await Component.InvokeAsync("Name")
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a>Настройки</a></li>
+                                <li><a asp-area="" asp-controller="Account" asp-action="Edit">Редактировать</a></li>
+                                <li><a asp-area="" asp-controller="Account" asp-action="Logout">Выйти</a></li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <a asp-area="" asp-controller="Account" asp-action="Login">Войти</a>
+                    }
+                </div>
             </div>
         </div>
     </nav>
 
     <partial name="_CookieConsentPartial" />
-
     <div class="container body-content">
         @RenderBody()
         <hr />
@@ -48,9 +70,9 @@
             <p>&copy; 2019 - StudentNetwork</p>
         </footer>
     </div>
-
     <environment include="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
         <script src="~/js/site.js" asp-append-version="true"></script>
     </environment>
@@ -70,6 +92,7 @@
         <script src="~/js/site.min.js" asp-append-version="true"></script>
     </environment>
 
+    <partial name="_ValidationScriptsPartial" />
     @RenderSection("Scripts", required: false)
 </body>
 </html>

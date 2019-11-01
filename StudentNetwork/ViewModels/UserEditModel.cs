@@ -1,9 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace StudentNetwork.ViewModels
 {
-    public class RegisterModel
+    public class UserEditModel
     {
         [Required(ErrorMessage = "Не указан логин")]
         [Remote("IsAvaible", "Account", ErrorMessage = "Логин занят")]
@@ -14,13 +18,5 @@ namespace StudentNetwork.ViewModels
 
         [Required(ErrorMessage = "Не указана фамилия")]
         public string LastName { get; set; }
-
-        [Required(ErrorMessage = "Не указан пароль")]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
-
-        [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "Пароль введен неверно")]
-        public string ConfirmPassword { get; set; }
     }
 }

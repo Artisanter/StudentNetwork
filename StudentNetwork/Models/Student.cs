@@ -17,11 +17,14 @@ namespace StudentNetwork.Models
         public string Name => $"{FirstName} {LastName}";
         public string Login { get; set; }
         public string PasswordHash { get; set; }
+        public string Password { set => PasswordHash = Hash(value); }
         public Group Group { get; set; }
 
+
+        private static readonly MD5 mD5 = MD5.Create();
         static public string Hash(string password)
         {
-            var hash = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(password));
+            var hash = mD5.ComputeHash(Encoding.UTF8.GetBytes(password));
             return Convert.ToBase64String(hash);
         }
     }

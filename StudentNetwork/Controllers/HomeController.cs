@@ -1,27 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StudentNetwork.Models;
 
 namespace StudentNetwork.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : ContextController
     {
-        private readonly StudentContext db;
-
-        public HomeController(StudentContext context)
-        {
-            db = context;
-        }
+        public HomeController(StudentContext context) : base(context)
+        { }
 
         [Authorize]
         public IActionResult Index()
         {
-            ViewBag.Student = db.Students.First(s => s.Login == User.Identity.Name);
+            ViewBag.Student = GetCurrentStudent();
             return View();
         }
         

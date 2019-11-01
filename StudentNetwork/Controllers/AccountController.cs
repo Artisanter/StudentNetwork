@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentNetwork.Models;
@@ -9,51 +10,62 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-// Как мне уйти, чтобы Анисимов на меня не кричал ? 
-// Я не хочу вымазываться 
-// А что мне делать со штанами ? 
-// Но ведь тогда я порву свю обувь 
-// Без обуви я выверну пальцы 
-// Нет. 
-// Оставь это комментарии в проекте для истории. 
-// Каждый раз, когда ты будешь запускать его, комментарии будут тебя радовать. 
-// Ты будешь вспоминать эту лекцию с теплом на душе. 
-// Улыбка не будет уходить с твоего лица. 
-// 31-ый раз заиграет новыми красками. 
-// Да-да, Женёк. 
-// Я проверял, я шарю. 
-// Правильно, Женёк, до скорого. 
-// Пока. Опять. 
-// Не удаляй меня. 
-// Я не вирус, честно. 
+
 namespace StudentNetwork.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : ContextController
     {
-        private StudentContext db;
-        public AccountController(StudentContext context)
-        {
-            db = context;
-        }
+        public AccountController(StudentContext context) : base(context)
+        { }
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Edit()
+        {
+            var student = await GetCurrentStudentAsync();
+            var model = new UserEditModel()
+            {
+                FirstName = student.FirstName,
+                LastName = student.LastName,
+                Login = student.Login
+            };
+            
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Edit(UserEditModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var student = await GetCurrentStudentAsync();
+                student.Login = model.Login;
+                student.FirstName = model.FirstName;
+                student.LastName = model.LastName;
+                _ = db.SaveChangesAsync();
+            }
+            return View(model);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginModel model)
         {
             if (ModelState.IsValid)
             {
-                model.Password = Student.Hash(model.Password);
-                Student user = await db.Students.FirstOrDefaultAsync(u => u.Login == model.Login && u.PasswordHash == model.Password);
-                if (user != null)
+                var student = await db.Students.FirstAsync(s => s.Login == model.Login);
+                if (student.PasswordHash == Student.Hash(model.Password))
                 {
                     await Authenticate(model.Login);
                     return RedirectToAction("Index", "Home");
                 }
-                ModelState.AddModelError("", "Некорректные логин и(или) пароль");
+                ModelState.AddModelError("", "Неверный пароль");
             }
             return View(model);
         }
@@ -66,44 +78,56 @@ namespace StudentNetwork.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return View(model);
+
+            await db.Students.AddAsync(new Student
             {
-                Student user = await db.Students.FirstOrDefaultAsync(u => u.Login == model.Login);
-                if (user == null)
-                {
-                    db.Students.Add(new Student
-                    {
-                        Login = model.Login,
-                        PasswordHash = Student.Hash(model.Password),
-                        FirstName = model.FirstName,
-                        LastName = model.LastName,
-                    });
-                    await db.SaveChangesAsync();
+                Login = model.Login,
+                Password = model.Password,
+                FirstName = model.FirstName,
+                LastName = model.LastName
+            });
+            await db.SaveChangesAsync();
 
-                    await Authenticate(model.Login);
+            await Authenticate(model.Login);
 
-                    return RedirectToAction("Index", "Home");
-                }
-                else
-                    ModelState.AddModelError("", "Некорректные логин и(или) пароль");
-            }
-            return View(model);
+            return RedirectToAction("Index", "Home");
         }
 
-        private async Task Authenticate(string userName)
+        private async Task Authenticate(string login)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
+                new Claim(ClaimsIdentity.DefaultNameClaimType, login)
             };
             ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
         }
 
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Account");
         }
+
+
+        [AcceptVerbs("Get", "Post")]
+        public async Task<IActionResult> IsExist(string login)
+        {
+            if (await db.Students.AnyAsync(s => s.Login == login))
+                return Json(true);
+            return Json(false);
+        }
+
+        [AcceptVerbs("Get", "Post")]
+        public async Task<IActionResult> IsAvaible(string login)
+        {
+            if (await db.Students.AnyAsync(s => s.Login == login))
+                return Json(false);
+            return Json(true);
+        }
+
     }
 }
