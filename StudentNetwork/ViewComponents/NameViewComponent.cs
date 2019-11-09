@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using StudentNetwork.Models;
 
 namespace StudentNetwork.ViewComponents
@@ -13,7 +9,7 @@ namespace StudentNetwork.ViewComponents
     {
         public NameViewComponent(StudentContext context) => db = context;
         private readonly StudentContext db;
-        private string last = "Guest";
+        private static string last = "Guest";
 
         [Authorize]
         public IViewComponentResult Invoke()
