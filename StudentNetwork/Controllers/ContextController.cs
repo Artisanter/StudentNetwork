@@ -10,16 +10,27 @@ namespace StudentNetwork.Controllers
 {
     public class ContextController : Controller
     {
-        protected readonly StudentContext db;
-        public ContextController(StudentContext context) => db = context;
+        protected StudentContext Db { get; set; }
+        public ContextController(StudentContext context) => Db = context;
 
         public async Task<Student> GetCurrentStudentAsync()
         {
-            return await db.Students.FirstAsync(s => s.Login == User.Identity.Name);
+            return await Db.Students.FirstAsync(s => s.Login == User.Identity.Name).ConfigureAwait(false);
         }
+
+        public async Task<Student> GetStudentAsync(string name)
+        {
+            return await Db.Students.FirstAsync(s => s.Login == name).ConfigureAwait(false);
+        }
+
         public Student GetCurrentStudent()
         {
-            return db.Students.First(s => s.Login == User.Identity.Name);
+            return Db.Students.First(s => s.Login == User.Identity.Name);
+        }
+
+        public Student GetStudent(string name)
+        {
+            return Db.Students.First(s => s.Login == name);
         }
 
         public IActionResult GetStudentName()

@@ -13,11 +13,13 @@ namespace StudentNetwork.Controllers
 
         public async Task<IActionResult> Send(Message model)
 		{
+            if (model is null)
+                return View();
 			model.DateTime = DateTime.Now;
-			model.Sender = await db.Students.FirstAsync(s => s.Login == User.Identity.Name);
+			model.Sender = await GetCurrentStudentAsync().ConfigureAwait(false);
 			model.Chat.Send(model);
-			db.Messages.Add(model);
-			await db.SaveChangesAsync();
+			Db.Messages.Add(model);
+			await Db.SaveChangesAsync().ConfigureAwait(false);
 			return View(model);
 		}
     }

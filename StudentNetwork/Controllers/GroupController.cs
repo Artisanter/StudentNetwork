@@ -23,15 +23,15 @@ namespace StudentNetwork.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(GroupModel model)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || model is null)
                 return View(model);
 
-            await db.Groups.AddAsync(new Group
+            await Db.Groups.AddAsync(new Group
             {
                 Name = model.Name,
                 Number = model.Number
-            });
-            await db.SaveChangesAsync();
+            }).ConfigureAwait(false);
+            await Db.SaveChangesAsync().ConfigureAwait(false);
 
             return RedirectToAction("Index", "Group");
         }
@@ -41,11 +41,11 @@ namespace StudentNetwork.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var group = await this.db.Groups.FirstAsync(g => g.Number == model.Number);
+            var group = await Db.Groups.FirstAsync(g => g.Number == model.Number).ConfigureAwait(false);
             var student = GetCurrentStudent();
             group.Students.Add(student);
             student.Group = group;
-            await db.SaveChangesAsync();
+            await Db.SaveChangesAsync().ConfigureAwait(false);
 
             return RedirectToAction("Index", "Group");
         }

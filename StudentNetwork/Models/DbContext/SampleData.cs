@@ -7,7 +7,7 @@ namespace StudentNetwork.Models
     {
         public static void Initialize(StudentContext context)
         {
-            if (context.Groups.Any())
+            if (context is null || context.Groups.Any())
                 return;
 
             var g1 = new Group()

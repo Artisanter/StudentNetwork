@@ -21,10 +21,10 @@ namespace StudentNetwork.Models
         public Group Group { get; set; }
 
 
-        private static readonly MD5 mD5 = MD5.Create();
+        private static readonly HMAC hMAC = HMAC.Create();
         static public string Hash(string password)
         {
-            var hash = mD5.ComputeHash(Encoding.UTF8.GetBytes(password));
+            var hash = hMAC.ComputeHash(Encoding.UTF8.GetBytes(password));
             return Convert.ToBase64String(hash);
         }
     }

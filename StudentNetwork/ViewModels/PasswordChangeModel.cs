@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -9,11 +10,16 @@ namespace StudentNetwork.ViewModels
     public class PasswordChangeModel
     {
         [Required(ErrorMessage = "Не указан пароль")]
+        [Remote("ConfirmPassword", "Account", ErrorMessage = "Пароль введен неверно")]
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public string OldPassword { get; set; }
+
+        [Required(ErrorMessage = "Не указан пароль")]
+        [DataType(DataType.Password)]
+        public string NewPassword { get; set; }
 
         [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "Пароль введен неверно")]
-        public string ConfirmPassword { get; set; }
+        [Compare("NewPassword", ErrorMessage = "Пароль введен неверно")]
+        public string ConfirmNewPassword { get; set; }
     }
 }

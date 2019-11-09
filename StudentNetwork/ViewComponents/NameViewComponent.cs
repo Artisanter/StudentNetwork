@@ -15,7 +15,7 @@ namespace StudentNetwork.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var student = await db.Students.FirstAsync(s => s.Login == User.Identity.Name);
+            var student = await db.Students.FirstAsync(s => s.Login == User.Identity.Name).ConfigureAwait(false);
             return Content(student.Name);
         }
     }

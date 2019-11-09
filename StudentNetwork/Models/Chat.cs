@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace StudentNetwork.Models
 {
-    public class Chat : IEnumerable<Message>
+    public class Chat
     {
         [Key]
         public int Id { get; set; }
-        public ICollection<Message> Messages { get; set; } = new List<Message>();
+        public ICollection<Message> Messages { get; } = new List<Message>();
 
         public IEnumerator<Message> GetEnumerator()
         {
@@ -20,13 +20,11 @@ namespace StudentNetwork.Models
 
         public void Send(Message message)
         {
+            if (message is null)
+                return;
             Messages.Add(message);
             message.Chat = this;
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return Messages.GetEnumerator();
-        }
     }
 }

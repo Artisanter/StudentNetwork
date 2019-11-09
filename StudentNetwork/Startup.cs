@@ -34,8 +34,8 @@ namespace StudentNetwork
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
-        
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+
+        public static void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {

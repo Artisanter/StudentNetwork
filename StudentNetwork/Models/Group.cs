@@ -13,6 +13,6 @@ namespace StudentNetwork.Models
         public uint Number { get; set; }
         public string Name { get; set; }
         public Chat Chat { get; set; } = new Chat();
-        public ICollection<Student> Students { get; set; } = new List<Student>();
+        public ICollection<Student> Students { get; } = new List<Student>();
     }
 }
