@@ -13,7 +13,6 @@ namespace StudentNetwork.Controllers
         [Authorize]
         public IActionResult Index()
         {
-            ViewBag.Student = GetCurrentStudent();
             return View();
         }
         

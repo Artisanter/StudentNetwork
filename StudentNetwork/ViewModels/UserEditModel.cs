@@ -10,7 +10,7 @@ namespace StudentNetwork.ViewModels
     public class UserEditModel
     {
         [Required(ErrorMessage = "Не указан логин")]
-        [Remote("IsAvaible", "Account", ErrorMessage = "Логин занят")]
+        [Remote("IsEditable", "Account", ErrorMessage = "Логин занят")]
         public string Login { get; set; }
 
         [Required(ErrorMessage = "Не указано имя")]

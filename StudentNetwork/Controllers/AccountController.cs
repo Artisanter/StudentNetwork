@@ -26,7 +26,7 @@ namespace StudentNetwork.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Edit()
+        public async Task<IActionResult> EditUser()
         {
             var student = await GetCurrentStudentAsync().ConfigureAwait(false);
             var model = new UserEditModel()
@@ -41,7 +41,7 @@ namespace StudentNetwork.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Edit(UserEditModel model)
+        public async Task<IActionResult> EditUser(UserEditModel model)
         {
             if (ModelState.IsValid && !(model is null))
             {
@@ -49,12 +49,14 @@ namespace StudentNetwork.Controllers
                 student.Login = model.Login;
                 student.FirstName = model.FirstName;
                 student.LastName = model.LastName;
-                _ = Db.SaveChangesAsync();
+                await Db.SaveChangesAsync().ConfigureAwait(false);
+                await Authenticate(model.Login).ConfigureAwait(true);
             }
             return View(model);
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult ChangePassword()
         {
             return this.View();
@@ -140,9 +142,17 @@ namespace StudentNetwork.Controllers
         }
 
         [AcceptVerbs("Get", "Post")]
-        public async Task<IActionResult> IsAvaible(string login)
+        public async Task<IActionResult> IsAbsent(string login)
         {
-            return Json(!await Db.Students.AnyAsync(s => s.Login == login).ConfigureAwait(false));
+            return Json(await Db.Students.AllAsync(s => s.Login != login).ConfigureAwait(false));
+        }
+
+        [AcceptVerbs("Get", "Post")]
+        public async Task<IActionResult> IsEditable(string login)
+        {
+            if ((await GetCurrentStudentAsync().ConfigureAwait(false)).Login == login)
+                return Json(true);
+            return Json(await Db.Students.AllAsync(s => s.Login != login).ConfigureAwait(false));
         }
 
         [AcceptVerbs("Get", "Post")]

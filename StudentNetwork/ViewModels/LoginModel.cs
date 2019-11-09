@@ -6,7 +6,7 @@ namespace StudentNetwork.ViewModels
     public class LoginModel
     {
         [Required(ErrorMessage = "Не указан логин")]
-        [Remote("IsExist", "Account", ErrorMessage = "Логин занят")]
+        [Remote("IsExist", "Account", ErrorMessage = "Неверный логин")]
         public string Login { get; set; }
 
         [Required(ErrorMessage = "Не указан пароль")]

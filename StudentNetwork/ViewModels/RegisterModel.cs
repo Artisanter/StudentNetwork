@@ -6,7 +6,7 @@ namespace StudentNetwork.ViewModels
     public class RegisterModel
     {
         [Required(ErrorMessage = "Не указан логин")]
-        [Remote("IsAvaible", "Account", ErrorMessage = "Логин занят")]
+        [Remote("IsAbsent", "Account", ErrorMessage = "Логин занят")]
         public string Login { get; set; }
 
         [Required(ErrorMessage = "Не указано имя")]

@@ -54,6 +54,13 @@ namespace StudentNetwork.Models
                     Login = "vadim",
                     Password = "vadim",
                     Group = g2
+                },
+                new Student()
+                {
+                    FirstName = "Дима",
+                    LastName = "Димов",
+                    Login = "dima",
+                    Password = "dima"
                 }
             );
             foreach (var student in context.Students.ToList())
