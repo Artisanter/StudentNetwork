@@ -70,10 +70,11 @@ namespace StudentNetwork.Models
                 {
                     Sender = student,
                     DateTime = DateTime.Now,
-                    Text = $"Привет, меня зовут {student.Name}"
+                    Text = $"Привет, меня зовут {student.Name}",
+                    Chat = student.Group.Chat
                 };
                 context.Messages.Add(message);
-                student.Group.Chat.Send(message);
+                student.Group.Chat.Messages.Add(message);
             }
 
             context.SaveChanges();

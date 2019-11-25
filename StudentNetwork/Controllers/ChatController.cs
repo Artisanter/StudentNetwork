@@ -11,16 +11,21 @@ namespace StudentNetwork.Controllers
         public ChatController(StudentContext context) : base(context)
         { }
 
-        public async Task<IActionResult> Send(Message model)
+        public async Task<IActionResult> Send(int id, string text)
 		{
-            if (model is null)
+            if (String.IsNullOrEmpty(text))
                 return View();
-			model.DateTime = DateTime.Now;
-			model.Sender = await GetCurrentStudentAsync().ConfigureAwait(false);
-			model.Chat.Send(model);
-			Db.Messages.Add(model);
+            var chat = Db.Chats.Find(id);
+            var message = new Message()
+            {
+                DateTime = DateTime.Now,
+                Sender = await GetCurrentStudentAsync().ConfigureAwait(false),
+                Chat = chat
+            };
+            chat.Messages.Add(message);
+			Db.Messages.Add(message);
 			await Db.SaveChangesAsync().ConfigureAwait(false);
-			return View(model);
+			return View(message);
 		}
     }
 }

@@ -10,7 +10,6 @@ namespace StudentNetwork.Controllers
         public HomeController(StudentContext context) : base(context)
         { }
 
-        [Authorize]
         public IActionResult Index()
         {
             return View();

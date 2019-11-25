@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentNetwork.Models;
@@ -24,7 +25,7 @@ namespace StudentNetwork.Controllers
         public async Task<IActionResult> Create(GroupModel model)
         {
             if (!ModelState.IsValid || model is null)
-                return View(model);
+                return RedirectToAction("Index", "Group");
 
             await Db.Groups.AddAsync(new Group
             {
@@ -50,5 +51,17 @@ namespace StudentNetwork.Controllers
             return RedirectToAction("Index", "Group");
         }
 
+        [Authorize]
+        public async Task<IActionResult> ListMates()
+        {
+            var student = await GetCurrentStudentAsync().ConfigureAwait(false);
+            return View("StudentList" ,Db.Students.Where(s => s.Group == student.Group));
+        }
+
+        [Authorize]
+        public IActionResult ListAll()
+        {
+            return View("StudentList" ,Db.Students);
+        }
     }
 }

@@ -18,13 +18,5 @@ namespace StudentNetwork.Models
             return Messages.GetEnumerator();
         }
 
-        public void Send(Message message)
-        {
-            if (message is null)
-                return;
-            Messages.Add(message);
-            message.Chat = this;
-        }
-
     }
 }

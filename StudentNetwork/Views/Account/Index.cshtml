@@ -1,0 +1,45 @@
+﻿@model StudentNetwork.Models.Student
+
+
+<h2>@Html.DisplayFor(model => model.Name)</h2>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Login)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Login)
+        </dd>
+    </dl>
+    @if (User.Identity.IsAuthenticated)
+    {
+        var friendship = Model.Friendships.FirstOrDefault(f => f.Second.Login == User.Identity.Name);
+        if (friendship is null || friendship.Status == FriendshipStatus.Stranger || friendship.Status == FriendshipStatus.HasRequest)
+        {
+            <input type="button" value="Добавить в друзья" class="btn btn-default" onclick="location.href='@Url.Action("Befriend", "Friends")'" />
+        }
+        else if (friendship.Status == FriendshipStatus.Requested)
+        {
+            <input type="button" value="Отменить запрос" class="btn btn-default" onclick="location.href='@Url.Action("Unfriend", "Friends")'" />
+        }
+        else
+        {
+            <input type="button" value="Убрать из друзей" class="btn btn-default" onclick="location.href='@Url.Action("Unfriend", "Friends")'" />
+        }
+
+    }
+</div>

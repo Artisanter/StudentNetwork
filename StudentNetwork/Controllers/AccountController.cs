@@ -18,6 +18,22 @@ namespace StudentNetwork.Controllers
         public AccountController(StudentContext context) : base(context)
         { }
 
+        [Authorize]
+        public IActionResult Self()
+        {
+            var student = GetCurrentStudent();
+            ViewData["Title"] = student.Name;
+            return View("Index", student);
+        }
+        public IActionResult Index(int id)
+        {
+            if (id == 0)
+                return Self();
+            var student = Db.Students.Find(id);
+            ViewData["Title"] = student.Name;
+            return View(student);
+        }
+
         [HttpGet]
         public IActionResult Login()
         {
