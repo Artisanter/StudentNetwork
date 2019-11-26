@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentNetwork.Models;
 using StudentNetwork.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -21,19 +23,47 @@ namespace StudentNetwork.Controllers
         [Authorize]
         public IActionResult Self()
         {
-            var student = GetCurrentStudent();
-            ViewData["Title"] = student.Name;
-            return View("Index", student);
-        }
-        public IActionResult Index(int id)
-        {
-            if (id == 0)
-                return Self();
-            var student = Db.Students.Find(id);
+            var student = Db.Students.Include(s => s.Image).First(s => s.Login == User.Identity.Name);
             ViewData["Title"] = student.Name;
             return View(student);
         }
+        public IActionResult Index(int id)
+        {
+            var student = Db.Students.Include(s => s.Image).First(s => s.Id == id);
+            ViewData["Title"] = student.Name;
+            if (User.Identity.IsAuthenticated)
+            {
+                var fs = Db.Friendships.FirstOrDefault(f => f.First.Login == User.Identity.Name && f.Second.Id == id);
+                ViewBag.FriendshipStatus = fs?.Status ?? FriendshipStatus.Stranger;
+            }
+            return View(student);
+        }
 
+        [HttpGet]
+        public ActionResult SetProfilePicture()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult SetProfilePicture(Image img, IFormFile uploadImage)
+        {
+            if (ModelState.IsValid && uploadImage != null)
+            {
+                byte[] data = null;
+                using (var binaryReader = new BinaryReader(uploadImage.OpenReadStream()))
+                {
+                    data = binaryReader.ReadBytes((int)uploadImage.Length);
+                }
+                img.Bytes = data;
+
+                Db.Images.Add(img);
+                GetCurrentStudent().Image = img;
+                Db.SaveChanges();
+
+                return RedirectToAction("Self");
+            }
+            return View(img);
+        }
         [HttpGet]
         public IActionResult Login()
         {
@@ -61,12 +91,12 @@ namespace StudentNetwork.Controllers
         {
             if (ModelState.IsValid && !(model is null))
             {
-                var student = await GetCurrentStudentAsync().ConfigureAwait(false);
+                var student = await GetEntireCurrentStudentAsync().ConfigureAwait(false);
                 student.Login = model.Login;
                 student.FirstName = model.FirstName;
                 student.LastName = model.LastName;
                 await Db.SaveChangesAsync().ConfigureAwait(false);
-                await Authenticate(model.Login).ConfigureAwait(true);
+                await Authenticate(model.Login, student.Role.Name).ConfigureAwait(true);
             }
             return View(model);
         }
@@ -100,8 +130,8 @@ namespace StudentNetwork.Controllers
                 var student = await GetStudentAsync(model.Login).ConfigureAwait(false);
                 if (student.PasswordHash == Student.Hash(model.Password))
                 {
-                    await Authenticate(model.Login).ConfigureAwait(false);
-                    return RedirectToAction("Index", "Home");
+                    await Authenticate(model.Login, student.Role.Name).ConfigureAwait(false);
+                    return RedirectToAction("Self");
                 }
                 ModelState.AddModelError("", "Неверный пароль");
             }
@@ -124,20 +154,22 @@ namespace StudentNetwork.Controllers
                 Login = model.Login,
                 Password = model.Password,
                 FirstName = model.FirstName,
-                LastName = model.LastName
+                LastName = model.LastName,
+                Role = Db.Roles.First(r => r.Name == "User")
             }).ConfigureAwait(false);
             await Db.SaveChangesAsync().ConfigureAwait(false);
 
-            await Authenticate(model.Login).ConfigureAwait(false);
+            await Authenticate(model.Login, "User").ConfigureAwait(false);
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Self");
         }
 
-        private async Task Authenticate(string login)
+        private async Task Authenticate(string login, string role)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, login)
+                new Claim(ClaimsIdentity.DefaultNameClaimType, login),
+                new Claim(ClaimsIdentity.DefaultRoleClaimType, role)
             };
             ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id)).ConfigureAwait(false);

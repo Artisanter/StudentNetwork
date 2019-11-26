@@ -2,8 +2,11 @@
 
 
 <h2>@Html.DisplayFor(model => model.Name)</h2>
+<div style="align-content:center">
 
-<div>
+    @Html.Raw("<img style=\"height:200px;\" src=\"data:image/jpeg;base64,"
+                                + Convert.ToBase64String(Model.Image.Bytes) + "\" />")
+
     <hr />
     <dl class="dl-horizontal">
         <dt>
@@ -27,19 +30,25 @@
     </dl>
     @if (User.Identity.IsAuthenticated)
     {
-        var friendship = Model.Friendships.FirstOrDefault(f => f.Second.Login == User.Identity.Name);
-        if (friendship is null || friendship.Status == FriendshipStatus.Stranger || friendship.Status == FriendshipStatus.HasRequest)
-        {
-            <input type="button" value="Добавить в друзья" class="btn btn-default" onclick="location.href='@Url.Action("Befriend", "Friends")'" />
-        }
-        else if (friendship.Status == FriendshipStatus.Requested)
-        {
-            <input type="button" value="Отменить запрос" class="btn btn-default" onclick="location.href='@Url.Action("Unfriend", "Friends")'" />
-        }
-        else
-        {
-            <input type="button" value="Убрать из друзей" class="btn btn-default" onclick="location.href='@Url.Action("Unfriend", "Friends")'" />
-        }
+<div class="row">
+    @if (ViewBag.FriendshipStatus == FriendshipStatus.Stranger)
+    {
+        <input type="button" value="Добавить в друзья" class="btn btn-default"
+               onclick="location.href='@Url.Action("Befriend", "Friends", new { id = Model.Id })'" />
+    }
+    else if (ViewBag.FriendshipStatus == FriendshipStatus.Subscriber)
+    {
+        <input type="button" value="Отменить запрос" class="btn btn-default"
+               onclick="location.href='@Url.Action("Unfriend", "Friends", new { id = Model.Id })'" />
+    }
+    else
+    {
+        <input type="button" value="Убрать из друзей" class="btn btn-default"
+               onclick="location.href='@Url.Action("Unfriend", "Friends", new { id = Model.Id})'" />
+    }
 
+    <input type="button" value="Написать сообщение" class="btn btn-default"
+           onclick="location.href='@Url.Action("Private", "Chat", new { id = Model.Id})'" />
+</div>
     }
 </div>

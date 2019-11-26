@@ -24,6 +24,9 @@
                 <input type="submit" value="Save" class="btn btn-default" />
             </div>
         </form>
-        <input type="button" value ="Change password" class="btn btn-default" onclick="location.href='@Url.Action("ChangePassword", "Account")'"/>
+        <div class="row">
+            <input type="button" value="Change password" class="btn btn-default" onclick="location.href='@Url.Action("ChangePassword", "Account")'" />
+            <input type="button" value="Change picture" class="btn btn-default" onclick="location.href='@Url.Action("SetProfilePicture", "Account")'" />
+        </div>
     </div>
 </div>

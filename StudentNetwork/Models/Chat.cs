@@ -11,12 +11,13 @@ namespace StudentNetwork.Models
     {
         [Key]
         public int Id { get; set; }
+        public AccessType Type { get; set; }
         public ICollection<Message> Messages { get; } = new List<Message>();
 
-        public IEnumerator<Message> GetEnumerator()
+        public enum AccessType
         {
-            return Messages.GetEnumerator();
-        }
-
+            Private,
+            Public
+        }        
     }
 }

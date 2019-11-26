@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace StudentNetwork.Models
 {
-    public class Group
+    public class Image
     {
         [Key]
         public int Id { get; set; }
-        public uint Number { get; set; }
         public string Name { get; set; }
-        public Chat Chat { get; set; } = new Chat();
-        public ICollection<Membership> Memberships { get; } = new HashSet<Membership>();
+        public uint Width { get; set; }
+        public uint Height { get; set; }
+        public byte[] Bytes { get; set; } 
     }
 }

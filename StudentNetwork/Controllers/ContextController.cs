@@ -18,6 +18,16 @@ namespace StudentNetwork.Controllers
             return await Db.Students.FirstAsync(s => s.Login == User.Identity.Name).ConfigureAwait(false);
         }
 
+        public async Task<Student> GetEntireCurrentStudentAsync() 
+        {
+            return await Db.Students
+                .Include(s=>s.Image)
+                .Include(s=>s.Friendships)
+                .Include(s=>s.Role)
+                .Include(s=>s.Memberships)
+                .ThenInclude(m=>m.Group)
+                .FirstAsync(s => s.Login == User.Identity.Name).ConfigureAwait(false);
+        }
         public async Task<Student> GetStudentAsync(string name)
         {
             return await Db.Students.FirstAsync(s => s.Login == name).ConfigureAwait(false);

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace StudentNetwork.Models
@@ -9,7 +11,25 @@ namespace StudentNetwork.Models
         {
             if (context is null || context.Groups.Any())
                 return;
+            byte[] data = null;
+            FileStream stream = new FileStream(Directory.GetCurrentDirectory() + 
+                "\\wwwroot\\images\\default_pic.jpg", FileMode.Open);
+            using (var binaryReader = new BinaryReader(stream))
+            {
+                data = binaryReader.ReadBytes((int)stream.Length);
+            }
+            Image img = new Image()
+            {
+                Bytes = data,
+                Name = "Default"
+            };
+            context.Images.Add(img);
 
+
+            var adminRole = new Role() { Name = "Admin" };
+            var userRole = new Role() { Name = "User" };
+
+            context.Roles.AddRange(adminRole, userRole);
             var g1 = new Group()
             {
                 Number = 753504,
@@ -25,11 +45,27 @@ namespace StudentNetwork.Models
             context.Students.AddRange(
                 new Student()
                 {
+                    FirstName = "Admin",
+                    LastName = "Adminov",
+                    Login = "admin",
+                    Password = "admin",
+                    Role = adminRole
+                },
+                new Student()
+                {
                     FirstName = "Евгений",
                     LastName = "Чижик",
                     Login = "eugene",
-                    Password = "eugene",
-                    Group = g1
+                    Password = "eugene",                    
+                    Memberships = new HashSet<Membership>()
+                    { 
+                        new Membership()
+                        {
+                            Group = g1,
+                            Role = adminRole
+                        }
+                    },
+                    Role = userRole
                 },
                 new Student()
                 {
@@ -37,7 +73,15 @@ namespace StudentNetwork.Models
                     LastName = "Дорофеев",
                     Login = "valya",
                     Password = "valya",
-                    Group = g1
+                    Memberships = new HashSet<Membership>()
+                    {
+                        new Membership()
+                        {
+                            Group = g1,
+                            Role = userRole
+                        }
+                    },
+                    Role = userRole
                 },
                 new Student()
                 {
@@ -45,7 +89,15 @@ namespace StudentNetwork.Models
                     LastName = "Чибисов",
                     Login = "vanya",
                     Password = "vanya",
-                    Group = g2
+                    Memberships = new HashSet<Membership>()
+                    {
+                        new Membership()
+                        {
+                            Group = g2,
+                            Role = adminRole
+                        }
+                    },
+                    Role = userRole
                 },
                 new Student()
                 {
@@ -53,28 +105,30 @@ namespace StudentNetwork.Models
                     LastName = "Олисейчик",
                     Login = "vadim",
                     Password = "vadim",
-                    Group = g2
+                    Memberships = new HashSet<Membership>()
+                    {
+                        new Membership()
+                        {
+                            Group = g2,
+                            Role = userRole
+                        }
+                    },
+                    Role = userRole
                 },
                 new Student()
                 {
                     FirstName = "Дима",
                     LastName = "Димов",
                     Login = "dima",
-                    Password = "dima"
+                    Password = "dima",
+                    Role = userRole
                 }
             );
             foreach (var student in context.Students.ToList())
             {
-                student.Group.Students.Add(student);
-                var message = new Message()
-                {
-                    Sender = student,
-                    DateTime = DateTime.Now,
-                    Text = $"Привет, меня зовут {student.Name}",
-                    Chat = student.Group.Chat
-                };
-                context.Messages.Add(message);
-                student.Group.Chat.Messages.Add(message);
+                if (student.Memberships.Count > 0)
+                    student.Memberships.First().Student = student;
+                student.Image = img;
             }
 
             context.SaveChanges();

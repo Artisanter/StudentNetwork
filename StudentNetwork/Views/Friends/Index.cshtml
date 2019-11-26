@@ -1,44 +1,24 @@
 ﻿@model IEnumerable<StudentNetwork.Models.Friendship>
 
-    @{
+
+@{
     ViewData["Title"] = "Friends";
-    }
+}
 
-    <h2>Search</h2>
+<h2>Search</h2>
 
-    <form asp-controller="Students" asp-action="Search">
-        <p>
-            <input type="text" name="searchString">
-            <input type="submit" value="Поиск" />
-        </p>
-    </form>
+<form asp-controller="Friends" asp-action="Search">
+    <p>
+        <input type="text" name="searchString">
+        <input type="submit" value="Поиск" />
+    </p>
+</form>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Second.Name)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Second.Login)
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
+<table class="table">
+    <tbody>
+        @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Second.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Second.Login)
-                </td>
-                <td>
-                    <input type="button" value="Убрать из друзей" class="btn btn-default" onclick="location.href='@Url.Action("Unfriend", "Friends")'" />
-                </td>
-            </tr>
+            @await Html.PartialAsync("_Details", item.Second)
         }
-        </tbody>
-    </table>
+    </tbody>
+</table>

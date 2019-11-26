@@ -14,55 +14,86 @@ namespace StudentNetwork.Controllers
         public FriendsController(StudentContext context) : base(context)
         { }
         [Authorize]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View((await GetCurrentStudentAsync().ConfigureAwait(false)).Friends);
+            return View(Db.Friendships
+                .Include(fs => fs.Second)
+                .ThenInclude(s=>s.Image)
+                .Where(fs => fs.Status == FriendshipStatus.Friend && fs.First.Login == User.Identity.Name));
         }
 
-        [HttpGet]
         public async Task<IActionResult> Search(string searchString)
         {
             IList<Student> students;
             if (String.IsNullOrEmpty(searchString))
-                students = await Db.Students.ToListAsync().ConfigureAwait(false);
-            students = await Db.Students
-                .Where(s => s.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-                .ToListAsync().ConfigureAwait(false);
+                students = await Db.Students.Include(s => s.Image).ToListAsync().ConfigureAwait(false);
+            else
+                students = await Db.Students
+                    .Include(s => s.Image)
+                    .Where(s => s.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    .ToListAsync().ConfigureAwait(false);
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = await GetCurrentStudentAsync().ConfigureAwait(false);
+                students.Remove(user);
+            }
+
             return View(students);
         }
 
         [Authorize]
-        public async void Befriend(int id)
+        public async Task<IActionResult> Befriend(int id)
         {
             var sender = await GetCurrentStudentAsync().ConfigureAwait(false);
-            var receiver = await Db.Students.FindAsync(id);
-            var friendship = await Db.Friendships
-                .FirstOrDefaultAsync(f => f.First == sender && f.Second == receiver).ConfigureAwait(false);
-            if (friendship is null)
+            var receiver = await Db.Students.FirstAsync(s => s.Id == id).ConfigureAwait(false);
+            
+            var friendship1 = await Db.Friendships.FirstOrDefaultAsync(f =>f.First == sender && f.Second == receiver)
+                .ConfigureAwait(false);
+            if (friendship1 is null)
             {
-                friendship = new Friendship()
-                {
-                    First = sender,
-                    Second = receiver
-                };
-                await Db.Friendships.AddAsync(friendship);
-                await Db.Friendships.AddAsync(friendship.SetReversed());
+                friendship1 = new Friendship(sender, receiver);
+                await Db.Friendships.AddAsync(friendship1);
             }
-            friendship.RaiseStatus();
+          
+            if(friendship1.Status != FriendshipStatus.Stranger)
+                return RedirectToAction("Index", "Account", new { id });
+
+            friendship1.Status = FriendshipStatus.Subscriber;
+            var friendship2 = await Db.Friendships.FirstOrDefaultAsync(f => f.First == receiver && f.Second == sender)
+                .ConfigureAwait(false);
+            if (friendship2 is null)
+            {
+                friendship2 = new Friendship(receiver, sender);
+                await Db.Friendships.AddAsync(friendship2);
+            }
+            else if(friendship2.Status == FriendshipStatus.Subscriber)
+            {
+                friendship1.Status = friendship2.Status = FriendshipStatus.Friend;
+            }
             await Db.SaveChangesAsync().ConfigureAwait(false);
+            return RedirectToAction("Index", "Account", new { id });
+
         }
         [Authorize]
-        public async void Unfriend(int id)
+        public async Task<IActionResult> Unfriend(int id)
         {
             var sender = await GetCurrentStudentAsync().ConfigureAwait(false);
-            var receiver = await Db.Students.FindAsync(id);
-            var friendship = await Db.Friendships
-                .FirstOrDefaultAsync(f => f.First == sender && f.Second == receiver).ConfigureAwait(false);
-            if (friendship != null)
+            var receiver = await Db.Students.FirstAsync(s => s.Id == id).ConfigureAwait(false);
+            var friendship1 = await Db.Friendships.FirstOrDefaultAsync(f => f.First == sender && f.Second == receiver)
+                .ConfigureAwait(false);
+            if (friendship1 is null || friendship1.Status == FriendshipStatus.Stranger)
+                return RedirectToAction("Index", "Account", new { id });
+
+            if (friendship1.Status == FriendshipStatus.Friend)
             {
-                friendship.LowerStatus();
-                await Db.SaveChangesAsync().ConfigureAwait(false);
+                var friendship2 = await Db.Friendships.FirstAsync(f => f.First == receiver && f.Second == sender)
+                    .ConfigureAwait(false);
+                friendship2.Status = FriendshipStatus.Subscriber;
             }
+
+            friendship1.Status = FriendshipStatus.Stranger;
+            await Db.SaveChangesAsync().ConfigureAwait(false);            
+            return RedirectToAction("Index", "Account", new { id });
         }
     }
 }

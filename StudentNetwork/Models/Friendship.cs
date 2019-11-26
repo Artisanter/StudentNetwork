@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,56 +10,27 @@ namespace StudentNetwork.Models
     public class Friendship
     {
         public Friendship() { }
-        [Key]
-        public int Id { get; set; }
-        public Student First { get; set; }
-        public Student Second { get; set; }
-        public Friendship Reversed { get; set; }
-        public Friendship SetReversed()
+        public Friendship(Student first, Student second)
         {
-            return Reversed = new Friendship()
-            {
-                First = Second,
-                Second = First,
-                Reversed = this,
-                Status = Status
-            };
+            First = first;
+            Second = second;
         }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+        [Editable(false), Required]
+        public virtual Student First { get; set; }
+        [Editable(false), Required]
+        public virtual Student Second { get; set; }
+        public virtual Chat Chat { get; set; }
         public bool IsBetween(Student s1, Student s2)
             => (Second == s1 && First == s2) || (First == s1 && Second == s2);
-        public FriendshipStatus Status { get; set; }
-        public void RaiseStatus()
-        {
-            switch (Status)
-            {
-                case FriendshipStatus.Stranger:
-                    Status = FriendshipStatus.Requested;
-                    Reversed.Status = FriendshipStatus.HasRequest;
-                    break;
-                case FriendshipStatus.HasRequest:
-                    Status = Reversed.Status = FriendshipStatus.Friend;
-                    break;
-            }
-        }
-        public void LowerStatus()
-        {
-            switch (Status)
-            {
-                case FriendshipStatus.Friend:
-                    Status = FriendshipStatus.HasRequest;
-                    Reversed.Status = FriendshipStatus.Requested;
-                    break;
-                case FriendshipStatus.Requested:
-                    Status = Reversed.Status = FriendshipStatus.Stranger;
-                    break;
-            }
-        }
+        public virtual FriendshipStatus Status { get; set; }
     }
 }
 public enum FriendshipStatus
 {
     Stranger = 0,
-    HasRequest = 1,
-    Requested = 1,
+    Subscriber = 1,
     Friend = 2
 }

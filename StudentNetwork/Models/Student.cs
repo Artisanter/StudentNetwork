@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StudentNetwork.Models
 {
@@ -17,9 +18,13 @@ namespace StudentNetwork.Models
         public string Name => $"{FirstName} {LastName}";
         public string Login { get; set; }
         public string PasswordHash { get; set; }
+        public Image Image { get; set; }
         public string Password { set => PasswordHash = Hash(value); }
-        public Group Group { get; set; }
-        public ICollection<Friendship> Friendships { get; } = new HashSet<Friendship>();
+        public virtual ICollection<Membership> Memberships { get; set; } = new HashSet<Membership>();
+        public Role Role { get; set; }
+        public int? RoleId { get; set; }
+        public virtual  ICollection<Friendship> Friendships { get; set; } = new HashSet<Friendship>();
+        [NotMapped]
         public IEnumerable<Student> Friends => Friendships.Select(f => f.Second);
 
 

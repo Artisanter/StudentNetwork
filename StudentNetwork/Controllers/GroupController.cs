@@ -37,26 +37,8 @@ namespace StudentNetwork.Controllers
             return RedirectToAction("Index", "Group");
         }
 
-        public async Task<IActionResult> Enter(GroupModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
 
-            var group = await Db.Groups.FirstAsync(g => g.Number == model.Number).ConfigureAwait(false);
-            var student = GetCurrentStudent();
-            group.Students.Add(student);
-            student.Group = group;
-            await Db.SaveChangesAsync().ConfigureAwait(false);
-
-            return RedirectToAction("Index", "Group");
-        }
-
-        [Authorize]
-        public async Task<IActionResult> ListMates()
-        {
-            var student = await GetCurrentStudentAsync().ConfigureAwait(false);
-            return View("StudentList" ,Db.Students.Where(s => s.Group == student.Group));
-        }
+        
 
         [Authorize]
         public IActionResult ListAll()
