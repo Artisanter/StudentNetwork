@@ -20,7 +20,7 @@ namespace StudentNetwork.Controllers
                 .ThenInclude(m => m.Sender)
                 .FirstAsync(c => c.Id == id)
                 .ConfigureAwait(false);
-            return View(chat);
+            return Redirect(Request.Headers["Referer"].ToString()); ;
         }
 
         [HttpPost]

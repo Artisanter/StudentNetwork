@@ -1,0 +1,23 @@
+﻿@model IEnumerable<StudentNetwork.Models.Student>
+
+
+@{
+    ViewData["Title"] = "Friends";
+}
+<br />
+@if (ViewBag.IsAdmin)
+{
+    <input type="button" value="Управление" class="btn btn-default"
+           onclick="location.href='@Url.Action("AdminView", "Group", new { id = ViewBag.GroupId })'" />
+}
+<table class="table">
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @await Html.PartialAsync("~/Views/Friends/_Details.cshtml", item);
+        }
+    </tbody>
+</table>
+
+<input type="button" value="Группа" class="btn btn-default"
+       onclick="location.href='@Url.Action("Index", "Group", new { groupId = ViewBag.GroupId })'" />

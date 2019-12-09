@@ -21,6 +21,7 @@ namespace StudentNetwork.Models
         public Image Image { get; set; }
         public string Password { set => PasswordHash = Hash(value); }
         public virtual ICollection<Membership> Memberships { get; set; } = new HashSet<Membership>();
+        [Required]
         public Role Role { get; set; }
         public int? RoleId { get; set; }
         public virtual  ICollection<Friendship> Friendships { get; set; } = new HashSet<Friendship>();

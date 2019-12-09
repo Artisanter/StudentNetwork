@@ -1,0 +1,31 @@
+﻿@model StudentNetwork.Models.Membership
+
+<div>
+    @await Html.PartialAsync("_Details", Model.Group)
+</div>
+@switch (Model.Status)
+{
+    case Membership.MemberStatus.Banned:
+        Html.Display("Вы забанены в этой группе");
+        break;
+    case Membership.MemberStatus.NotSubscribed:
+        <input type="button" value="Подписаться" class="btn btn-default"
+               onclick="location.href='@Url.Action("Subscribe", "Group", new { id = Model.Group.Id })'" />
+        break;
+    case Membership.MemberStatus.Subscribed:
+        <input type="button" value="Отменить подписку" class="btn btn-default"
+               onclick="location.href='@Url.Action("Unsubscribe", "Group", new { id = Model.Group.Id })'" />
+        break;
+    case Membership.MemberStatus.Approved:
+        <input type="button" value="Отменить подписку" class="btn btn-default"
+               onclick="location.href='@Url.Action("Unsubscribe", "Group", new { id = Model.Group.Id })'" />
+        <input type="button" value="Участники" class="btn btn-default"
+               onclick="location.href='@Url.Action("Mates", "Group", new { id = Model.Group.Id })'" />
+        <div>
+            @await Html.PartialAsync("~/Views/Chat/Index.cshtml", Model.Group.Chat)
+        </div>
+        break;
+}
+<div>
+    <a asp-action="List">Back to List</a>
+</div>

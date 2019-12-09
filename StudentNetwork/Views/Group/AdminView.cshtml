@@ -1,0 +1,58 @@
+﻿@model IEnumerable<StudentNetwork.Models.Membership>
+
+
+@{
+    ViewData["Title"] = "AdminView";
+}
+
+<br />
+
+<table class="table">
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @await Html.PartialAsync("~/Views/Friends/_Details.cshtml", item.Student)
+
+            <tr>
+                <td>
+                    @if (item.Status == Membership.MemberStatus.Approved)
+                    {
+
+                        <input type="button" value="Забанить" class="btn btn-default"
+                               onclick="location.href='@Url.Action("Ban", "Group", new { groupId = ViewBag.GroupId, userId = item.Student.Id })'" />
+                    }
+                    else if (item.Status == Membership.MemberStatus.Subscribed)
+                    {
+                        <input type="button" value="Одобрить запрос" class="btn btn-default"
+                               onclick="location.href='@Url.Action("Apply", "Group", new { groupId = ViewBag.GroupId, userId = item.Student.Id })'" />
+
+                    }
+                    else if (item.Status == Membership.MemberStatus.Banned)
+                    {
+                        <input type="button" value="Разбанить" class="btn btn-default"
+                               onclick="location.href='@Url.Action("Unban", "Group", new { groupId = ViewBag.GroupId, userId = item.Student.Id })'" />
+
+                    }
+                </td>
+
+                <td>
+                    @if (item.Role.Name == "User")
+                    {
+                    <input type="button" value="Сделать админом" class="btn btn-default"
+                           onclick="location.href='@Url.Action("GiveAdmin", "Group", new { groupId = ViewBag.GroupId, userId = item.Student.Id })'" />
+
+                    }
+                    else
+                    {
+                    <input type="button" value="Отобрать админку" class="btn btn-default"
+                           onclick="location.href='@Url.Action("TakeAdmin", "Group", new { groupId = ViewBag.GroupId, userId = item.Student.Id })'" />
+
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<input type="button" value="Группа" class="btn btn-default"
+       onclick="location.href='@Url.Action("Index", "Group", new {id = ViewBag.GroupId })'" />

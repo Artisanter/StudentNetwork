@@ -127,7 +127,10 @@ namespace StudentNetwork.Controllers
         {
             if (ModelState.IsValid && !(model is null))
             {
-                var student = await GetStudentAsync(model.Login).ConfigureAwait(false);
+                var student = await Db.Students
+                    .Include(s => s.Role)
+                    .FirstAsync(s => s.Login == model.Login)
+                    .ConfigureAwait(false);
                 if (student.PasswordHash == Student.Hash(model.Password))
                 {
                     await Authenticate(model.Login, student.Role.Name).ConfigureAwait(false);

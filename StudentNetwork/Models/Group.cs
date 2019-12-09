@@ -12,6 +12,7 @@ namespace StudentNetwork.Models
         public int Id { get; set; }
         public uint Number { get; set; }
         public string Name { get; set; }
+        public Image Image { get; set; }
         public Chat Chat { get; set; } = new Chat();
         public ICollection<Membership> Memberships { get; } = new HashSet<Membership>();
     }

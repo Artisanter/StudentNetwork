@@ -1,0 +1,15 @@
+﻿@model IEnumerable<StudentNetwork.Models.Group>
+
+<h3>Search</h3>
+
+<form asp-controller="Group" asp-action="Search">
+    <p>
+        <input type="text" name="searchString">
+        <input type="submit" value="Поиск" />
+    </p>
+</form>
+
+@foreach (var item in Model)
+{
+    @await Html.PartialAsync("_Details", item);
+}

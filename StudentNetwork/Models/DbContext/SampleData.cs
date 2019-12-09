@@ -12,12 +12,14 @@ namespace StudentNetwork.Models
             if (context is null || context.Groups.Any())
                 return;
             byte[] data = null;
-            FileStream stream = new FileStream(Directory.GetCurrentDirectory() + 
-                "\\wwwroot\\images\\default_pic.jpg", FileMode.Open);
-            using (var binaryReader = new BinaryReader(stream))
+            using (var stream = new FileStream(Directory.GetCurrentDirectory() +
+                "\\wwwroot\\images\\default_pic.jpg", FileMode.Open))
             {
-                data = binaryReader.ReadBytes((int)stream.Length);
-            }
+                using (var binaryReader = new BinaryReader(stream))
+                {
+                    data = binaryReader.ReadBytes((int)stream.Length);
+                }
+            }            
             Image img = new Image()
             {
                 Bytes = data,
@@ -25,6 +27,20 @@ namespace StudentNetwork.Models
             };
             context.Images.Add(img);
 
+            using (var stream = new FileStream(Directory.GetCurrentDirectory() +
+                "\\wwwroot\\images\\default_group_pic.jpg", FileMode.Open))
+            {
+                using (var binaryReader = new BinaryReader(stream))
+                {
+                    data = binaryReader.ReadBytes((int)stream.Length);
+                }
+            }
+            Image group_img = new Image()
+            {
+                Bytes = data,
+                Name = "Group Default"
+            };
+            context.Images.Add(img);
 
             var adminRole = new Role() { Name = "Admin" };
             var userRole = new Role() { Name = "User" };
@@ -33,12 +49,14 @@ namespace StudentNetwork.Models
             var g1 = new Group()
             {
                 Number = 753504,
-                Name = "Четвертая группа"
+                Name = "Четвертая группа",
+                Image = group_img
             };
             var g2 = new Group()
             {
                 Number = 753505,
-                Name = "Пятая группа"
+                Name = "Пятая группа",
+                Image = group_img
             };
             context.Groups.AddRange(g1, g2);
 
@@ -61,6 +79,7 @@ namespace StudentNetwork.Models
                     { 
                         new Membership()
                         {
+                            Status = Membership.MemberStatus.Approved,
                             Group = g1,
                             Role = adminRole
                         }
@@ -77,6 +96,7 @@ namespace StudentNetwork.Models
                     {
                         new Membership()
                         {
+                            Status = Membership.MemberStatus.Approved,
                             Group = g1,
                             Role = userRole
                         }
@@ -93,6 +113,7 @@ namespace StudentNetwork.Models
                     {
                         new Membership()
                         {
+                            Status = Membership.MemberStatus.Approved,
                             Group = g2,
                             Role = adminRole
                         }
@@ -109,6 +130,7 @@ namespace StudentNetwork.Models
                     {
                         new Membership()
                         {
+                            Status = Membership.MemberStatus.Approved,
                             Group = g2,
                             Role = userRole
                         }

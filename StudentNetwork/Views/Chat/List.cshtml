@@ -9,7 +9,7 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr onclick="location.href='@Url.Action("Index", "Chat", new { id = item.Chat.Id })'">
+            <tr>
                 <td style="width: 120px;">
                     <a asp-action="Index" asp-controller="Account" asp-route-id="@item.Second.Id">
                         @Html.Raw("<img style='width: 100px;height: 100px;border-radius: 50%;' src=\"data:image/jpeg;base64,"
@@ -20,17 +20,20 @@
                     <p>
                         @Html.DisplayFor(modelItem => item.Second.Name)
                     </p>
-                    <p>
-                        @{
-                            var message = item.Chat.Messages.OrderByDescending(m => m.DateTime).First();
-                            if (message.Sender == item.Second)
-                                Html.Display(message.Text);
-                            else
-                                Html.Display("Вы: " + message.Text);
+                    <a onclick="location.href='@Url.Action("Index", "Chat", new { id = item.Chat.Id })'">
+                        <p>
+                            @{
+                                var message = item.Chat.Messages.OrderByDescending(m => m.DateTime).First();
+                                if (message.Sender == item.Second)
+                                    Html.Display(message.Text);
+                                else
+                                    Html.Display("Вы: " + message.Text);
 
-                        }
+                            }
 
-                    </p>
+                        </p>
+
+                    </a>
                 </td>
             </tr>
         }

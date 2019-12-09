@@ -10,6 +10,7 @@ namespace StudentNetwork.Models
         public DbSet<Message> Messages { get; set; }
         public DbSet<Chat> Chats { get; set; }
         public DbSet<Friendship> Friendships { get; set; }
+        public DbSet<Membership> Memberships { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<Role> Roles { get; set; }
 

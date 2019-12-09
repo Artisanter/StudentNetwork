@@ -11,8 +11,6 @@ namespace StudentNetwork.Models
         [Key]
         public int Id { get; set; }
         public string Name { get; set; }
-        public uint Width { get; set; }
-        public uint Height { get; set; }
         public byte[] Bytes { get; set; } 
     }
 }

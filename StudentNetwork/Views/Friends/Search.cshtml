@@ -4,7 +4,7 @@
     ViewData["Title"] = "Search";
 }
 
-<h2>Search</h2>
+<h3>Search</h3>
 
 <form asp-controller="Students" asp-action="Search">
     <p>
@@ -13,11 +13,7 @@
     </p>
 </form>
 
-<table class="table">
-    <tbody>
-        @foreach (var item in Model)
-        {
-            @await Html.PartialAsync("_Details", item)
-        }
-    </tbody>
-</table>
+@foreach (var item in Model)
+{
+    @await Html.PartialAsync("_Details", item)
+}
