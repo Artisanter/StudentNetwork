@@ -1,24 +1,43 @@
 ﻿@model Chat
-    <div style="overflow-y: scroll; overflow-wrap:break-word; display:block; position:relative; z-index:1">
-        @foreach (var item in Model.Messages.OrderBy(m => m.DateTime))
-        {
-            <br/>
-            <a asp-action="Index" asp-controller="Account" asp-route-id="@item.Sender.Id">
-                @Html.DisplayFor(modelItem => item.Sender.Name)
-            </a>
-            <p style=" word-wrap:break-word">
-                @Html.DisplayFor(modelItem => item.Text)
-            </p>
-            <p style="text-align:right;">
-                @Html.DisplayFor(modelItem => item.DateTime)
-            </p>
-        }
-    </div>
+<div id="chatroom" style="overflow-y: scroll; overflow-wrap:break-word; display:block; position:relative; z-index:1">
+    @foreach (var item in Model.Messages.OrderBy(m => m.DateTime))
+    {
+        <br />
+        <a asp-action="Index" asp-controller="Account" asp-route-id="@item.Sender.Id">
+            @Html.DisplayFor(modelItem => item.Sender.Name)
+        </a>
+        <p style=" word-wrap:break-word">
+            @Html.DisplayFor(modelItem => item.Text)
+        </p>
+        <p style="text-align:right;">
+            @Html.DisplayFor(modelItem => item.DateTime)
+        </p>
+    }
+</div>
 
 <form asp-action="Send" asp-controller="Chat" style="display:block; position:relative; word-wrap:normal; min-height:40px" autocomplete="off">
     <p>
-        <input type="hidden" name="id" value='@Model.Id'/>
-        <input type="text" name="text"  style=" word-wrap:break-word; width:90%;">
-        <input type="submit" value="Отправить" />
+        <input type="hidden" name="id" value='@Model.Id' />
+        <input id ="text" type="text" name="text" style=" word-wrap:break-word; width:90%;">
+        <input id="sendBtn" type="submit" value="@Localizer["Send"]" />
     </p>
 </form>
+<script src="~/js/signalr/signalr.js"></script>
+<script>
+    const hubConnection = new signalR.HubConnectionBuilder()
+        .withUrl("/chat_hub")
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+    hubConnection.on("Send", async function (data) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        location.reload();
+        console.log("received");
+    });
+
+    document.getElementById("sendBtn").addEventListener("click", function (e) {
+        let message = { 'text': document.getElementById("text").value };
+        console.log("send");
+        hubConnection.invoke("Send", message);
+    });
+    hubConnection.start();
+</script>
