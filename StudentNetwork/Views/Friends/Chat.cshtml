@@ -1,0 +1,52 @@
+﻿@model (Friendship, IEnumerable<Message>)
+@{
+    ViewData["Title"] = Model.Item1.Second.Name;
+}
+
+<div>
+    @await Html.PartialAsync("_Details", Model.Item1.Second)
+</div>
+<div id="messages">
+    @await Html.PartialAsync("~/Views/Shared/_ChatPartial.cshtml", Model.Item2)
+</div>
+
+<form asp-action="Send" asp-controller="Chat" style="display:block; position:relative; word-wrap:normal; min-height:40px" autocomplete="off">
+    <p>
+        <input type="hidden" name="id" value='@Model.Item1.Chat.Id' />
+        <input type="text" name="text" style=" word-wrap:break-word; width:90%;">
+        <input type="submit" value="@Localizer["Send"]" />
+    </p>
+</form>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+<script>
+    $(function () {
+        var page = 0;
+        var _inCallback = false;
+        function loadItems() {
+            if (page > -1 && !_inCallback) {
+                _inCallback = true;
+                page++;
+                $.ajax({
+                    url: '/chat/' + @Model.Item1.Id + '/' + page,
+                    success: function (data) {
+                        if (data != '') {
+                            $("#messages").append(data);
+                        }
+                        else {
+                            page = -1;
+                        }
+                        _inCallback = false;
+                    }
+                });
+            }
+        }
+        $(window).scroll(function () {
+            if ($(window).scrollTop() + $(window).height() > $(document).height() - 16) {
+                loadItems();
+                this.console.log("log");
+            }
+            this.console.log("handle");
+        });
+    })
+</script>
