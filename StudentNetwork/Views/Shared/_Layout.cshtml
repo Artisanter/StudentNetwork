@@ -32,10 +32,10 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Account" asp-action="Self">Моя страница</a></li>
-                    <li><a asp-area="" asp-controller="Friends" asp-action="Index">Мои друзья</a></li>
-                    <li><a asp-area="" asp-controller="Chat" asp-action="List">Мои сообщения</a></li>
-                    <li><a asp-area="" asp-controller="Group" asp-action="List">Мои группы</a></li>
+                    <li><a asp-area="" asp-controller="Account" asp-action="Self"> @Localizer["My page"]</a></li>
+                    <li><a asp-area="" asp-controller="Friends" asp-action="Index"> @Localizer["My friends"]</a></li>
+                    <li><a asp-area="" asp-controller="Chat" asp-action="List">@Localizer["My messages"]</a></li>
+                    <li><a asp-area="" asp-controller="Group" asp-action="List">@Localizer["My groups"]</a></li>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right media-middle">
@@ -43,20 +43,20 @@
                     {
                         <li class="dropdown">
                             <button class="btn navbar-btn dropdown-toggle" data-toggle="dropdown">
-                                @await Component.InvokeAsync("Name")
+                                <vc:name/>
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a>Настройки</a></li>
-                                <li><a asp-area="" asp-controller="Account" asp-action="EditUser">Редактировать</a></li>
-                                <li><a asp-area="" asp-controller="Account" asp-action="Logout">Выйти</a></li>
+                                <li><a asp-area="" asp-controller="Settings" asp-action="Index">@Localizer["Settings"]</a></li>
+                                <li><a asp-area="" asp-controller="Account" asp-action="EditUser">@Localizer["Edit"]</a></li>
+                                <li><a asp-area="" asp-controller="Account" asp-action="Logout">@Localizer["Logout"]</a></li>
                             </ul>
                         </li>
                     }
                     else
                     {
-                        <li><a asp-area="" asp-controller="Account" asp-action="Login">Вход</a></li>
-                        <li><a asp-area="" asp-controller="Account" asp-action="Register">Регистрация</a></li>
+                        <li><a asp-area="" asp-controller="Account" asp-action="Login">@Localizer["Sign in"]</a></li>
+                        <li><a asp-area="" asp-controller="Account" asp-action="Register">@Localizer["Sign up"]</a></li>
                     }
                 </ul>
             </div>
@@ -68,6 +68,9 @@
         @RenderBody()
         <hr />
         <footer>
+            <div>
+                @await Html.PartialAsync("_SelectLanguagePartial")
+            </div>
             <p>&copy; 2019 - StudentNetwork</p>
         </footer>
     </div>

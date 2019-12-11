@@ -1,15 +1,15 @@
 ﻿@model IEnumerable<StudentNetwork.Models.Student>
 
 @{
-    ViewData["Title"] = "Search";
+    ViewData["Title"] = @Localizer["Search"];
 }
 
 <h3>Search</h3>
 
-<form asp-controller="Students" asp-action="Search">
+<form asp-controller="Students" asp-action="@Localizer["Search"]">
     <p>
         <input type="text" name="searchString">
-        <input type="submit" value="Поиск" />
+        <input type="submit" value="@Localizer["Search"]" />
     </p>
 </form>
 

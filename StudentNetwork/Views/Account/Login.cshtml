@@ -1,7 +1,7 @@
 ﻿@model StudentNetwork.ViewModels.LoginModel
 
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = Localizer["Log in"];
 }
 
 <h2>Log in</h2>
@@ -12,17 +12,17 @@
         <form asp-action="Login" asp-controller="Account">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Login" class="control-label"></label>
+                <label asp-for="@Localizer["Login"]" class="control-label"></label>
                 <input asp-for="Login" class="form-control" />
                 <span asp-validation-for="Login" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Password" class="control-label"></label>
+                <label asp-for="@Localizer["Password"]" class="control-label"></label>
                 <input asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Log in" class="btn btn-default" />
+                <input type="submit" value="@Localizer["Log in"]" class="btn btn-default" />
             </div>
         </form>
     </div>

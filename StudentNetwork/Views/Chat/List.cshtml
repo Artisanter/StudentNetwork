@@ -7,35 +7,26 @@
 
 <table class="table">
     <tbody>
-        @foreach (var item in Model)
+       @foreach (var item in Model)
         {
-            <tr>
-                <td style="width: 120px;">
-                    <a asp-action="Index" asp-controller="Account" asp-route-id="@item.Second.Id">
-                        @Html.Raw("<img style='width: 100px;height: 100px;border-radius: 50%;' src=\"data:image/jpeg;base64,"
-                                 + Convert.ToBase64String(item.Second.Image.Bytes) + "\" />")
-                    </a>
-                </td>
-                <td>
-                    <p>
+        <tr>
+            <td style="width: 120px;">
+                <a asp-action="Index" asp-controller="Account" asp-route-id="@item.Second.Id">
+                    <picture round="true" image="item.Second.Image" />
+                </a>
+            </td>
+            <td>
+                <p>
+                    <a onclick="location.href='@Url.Action("Chat", "Friends", new { item.Id })'">
                         @Html.DisplayFor(modelItem => item.Second.Name)
-                    </p>
-                    <a onclick="location.href='@Url.Action("Index", "Chat", new { id = item.Chat.Id })'">
-                        <p>
-                            @{
-                                var message = item.Chat.Messages.OrderByDescending(m => m.DateTime).First();
-                                if (message.Sender == item.Second)
-                                    Html.Display(message.Text);
-                                else
-                                    Html.Display("Вы: " + message.Text);
+                        </a>
+                </p>
+                <p>
+                    <vc:last-message chat-id="item.Chat.Id" />
+                </p>
 
-                            }
-
-                        </p>
-
-                    </a>
-                </td>
-            </tr>
+            </td>
+        </tr>
         }
     </tbody>
 </table>

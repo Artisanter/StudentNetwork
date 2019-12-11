@@ -1,0 +1,16 @@
+﻿@model IEnumerable<Message>
+<div style="overflow-y: scroll; overflow-wrap:break-word; display:block; position:relative; z-index:1">
+    @foreach (var item in Model)
+        {
+    <br />
+    <a asp-action="Index" asp-controller="Account" asp-route-id="@item.Sender.Id">
+        @Html.DisplayFor(modelItem => item.Sender.Name)
+    </a>
+    <p style=" word-wrap:break-word">
+        @Html.DisplayFor(modelItem => item.Text)
+    </p>
+    <p style="text-align:right;">
+        @Html.DisplayFor(modelItem => item.DateTime)
+    </p>
+        }
+</div>

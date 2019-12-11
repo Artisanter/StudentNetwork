@@ -5,12 +5,12 @@
     ViewData["Title"] = "Friends";
 }
 
-<h2>Search</h2>
+<h2>@Localizer["Search"]</h2>
 
 <form asp-controller="Friends" asp-action="Search">
     <p>
         <input type="text" name="searchString">
-        <input type="submit" value="Поиск" />
+        <input type="submit" value="@Localizer["Search"]" />
     </p>
 </form>
 

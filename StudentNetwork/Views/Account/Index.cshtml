@@ -1,6 +1,5 @@
 ﻿@model StudentNetwork.Models.Student
 
-
 <h2>@Html.DisplayFor(model => model.Name)</h2>
 <div style="align-content:center">
 
@@ -10,19 +9,19 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.FirstName)
+            @Localizer["FirstName"]
         </dt>
         <dd>
             @Html.DisplayFor(model => model.FirstName)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.LastName)
+            @Localizer["LastName"]
         </dt>
         <dd>
             @Html.DisplayFor(model => model.LastName)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Login)
+            @Localizer["Login"]
         </dt>
         <dd>
             @Html.DisplayFor(model => model.Login)
@@ -30,25 +29,25 @@
     </dl>
     @if (User.Identity.IsAuthenticated)
     {
-<div class="row">
-    @if (ViewBag.FriendshipStatus == FriendshipStatus.Stranger)
-    {
-        <input type="button" value="Добавить в друзья" class="btn btn-default"
-               onclick="location.href='@Url.Action("Befriend", "Friends", new { id = Model.Id })'" />
-    }
-    else if (ViewBag.FriendshipStatus == FriendshipStatus.Subscriber)
-    {
-        <input type="button" value="Отменить запрос" class="btn btn-default"
-               onclick="location.href='@Url.Action("Unfriend", "Friends", new { id = Model.Id })'" />
-    }
-    else
-    {
-        <input type="button" value="Убрать из друзей" class="btn btn-default"
-               onclick="location.href='@Url.Action("Unfriend", "Friends", new { id = Model.Id})'" />
-    }
+        <div class="row">
+            @if (ViewBag.FriendshipStatus == FriendshipStatus.Stranger)
+            {
+                <input type="button" value="@Localizer["Befriend"]" class="btn btn-default"
+                       onclick="location.href='@Url.Action("Befriend", "Friends", new { id = Model.Id })'" />
+            }
+            else if (ViewBag.FriendshipStatus == FriendshipStatus.Subscriber)
+            {
+                <input type="button" value="@Localizer["CancelRequest"]" class="btn btn-default"
+                       onclick="location.href='@Url.Action("Unfriend", "Friends", new { id = Model.Id })'" />
+            }
+            else
+            {
+                <input type="button" value="@Localizer["Unfriend"]" class="btn btn-default"
+                       onclick="location.href='@Url.Action("Unfriend", "Friends", new { id = Model.Id})'" />
+            }
 
-    <input type="button" value="Написать сообщение" class="btn btn-default"
-           onclick="location.href='@Url.Action("Private", "Chat", new { id = Model.Id})'" />
-</div>
+            <input type="button" value="@Localizer["WriteMessage"]" class="btn btn-default"
+                   onclick="location.href='@Url.Action("Private", "Chat", new { id = Model.Id})'" />
+        </div>
     }
 </div>

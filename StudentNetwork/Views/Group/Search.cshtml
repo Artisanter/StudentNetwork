@@ -1,11 +1,11 @@
 ﻿@model IEnumerable<StudentNetwork.Models.Group>
 
-<h3>Search</h3>
+    <h3>@Localizer["Search"]</h3>
 
 <form asp-controller="Group" asp-action="Search">
     <p>
         <input type="text" name="searchString">
-        <input type="submit" value="Поиск" />
+        <input type="submit" value="@Localizer["Search"]" />
     </p>
 </form>
 

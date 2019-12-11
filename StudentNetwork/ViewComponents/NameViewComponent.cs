@@ -9,13 +9,12 @@ namespace StudentNetwork.ViewComponents
     {
         public NameViewComponent(StudentContext context) => db = context;
         private readonly StudentContext db;
-        private static string last = "Guest";
 
         [Authorize]
         public IViewComponentResult Invoke()
         {
-            last = db.Students.FirstOrDefault(s => s.Login == User.Identity.Name)?.Name ?? last;
-            return Content(last);
+            var name = db.Students.FirstOrDefault(s => s.Login == User.Identity.Name)?.Name;
+            return Content(name);
         }
     }
 }
