@@ -14,14 +14,15 @@ namespace StudentNetwork.Controllers
         public FriendsController(StudentContext context) : base(context)
         { }
         [Authorize]
+        [Route("friends")]
         public IActionResult Index()
         {
             return View(Db.Friendships
                 .Include(fs => fs.Second)
-                .ThenInclude(s=>s.Image)
+                    .ThenInclude(s=>s.Image)
                 .Where(fs => fs.Status == FriendshipStatus.Friend && fs.First.Login == User.Identity.Name));
         }
-
+        [Route("friends/search")]
         public async Task<IActionResult> Search(string searchString)
         {
             IList<Student> students;
@@ -95,5 +96,31 @@ namespace StudentNetwork.Controllers
             await Db.SaveChangesAsync().ConfigureAwait(false);            
             return RedirectToAction("Index", "Account", new { id });
         }
+        const int pageSize = 3;
+        [Authorize]
+        [Route("chat/{id}")]
+        [Route("chat/{id}/{page}")]
+        public IActionResult Chat(int id, int page)
+        {
+            var fs = Db.Friendships
+                .Include(fs => fs.Chat)
+                    .ThenInclude(c => c.Messages)
+                        .ThenInclude(msg => msg.Sender)
+                .Include(fs => fs.Second)
+                    .ThenInclude(s=>s.Image)
+                .First(fs => fs.Id == id);
+
+            var messages = fs.Chat.Messages
+                .OrderByDescending(m => m.DateTime)
+                .Skip(page * pageSize)
+                .Take(pageSize);
+
+            if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_ChatPartial", messages);
+            }
+            return View((fs, messages));
+        }
+
     }
 }

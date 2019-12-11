@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentNetwork.Models;
@@ -9,9 +10,11 @@ namespace StudentNetwork.Controllers
 {
     public class ChatController : ContextController
     {
-        public ChatController(StudentContext context) : base(context)
-        { }
-
+        public ChatController(StudentContext context, IHubContext<ChatHub> hubContext) : base(context)
+        {
+            _hubContext = hubContext;
+        }
+        private readonly IHubContext<ChatHub> _hubContext;
         [HttpGet]
         public async Task<IActionResult> Index(int id)
         {
@@ -38,6 +41,7 @@ namespace StudentNetwork.Controllers
             };
             Db.Messages.Add(message);
             await Db.SaveChangesAsync().ConfigureAwait(false);
+            //await _hubContext.Clients.All.SendAsync("Send", message).ConfigureAwait(false);
             return RedirectToAction("Index", new { id }); ;
         }
         public async Task<IActionResult> Private(int id)
@@ -68,18 +72,17 @@ namespace StudentNetwork.Controllers
                 friendship1.Chat = friendship2.Chat = new Chat();
                 await Db.SaveChangesAsync().ConfigureAwait(false);
             }
-            return RedirectToAction("Index", new { friendship1.Chat.Id });
+            return RedirectToAction("Chat", "Friends", new { friendship1.Id });
         }
+        [Route("im")]
         public async Task<IActionResult> List()
         {
             var user = await GetCurrentStudentAsync().ConfigureAwait(false);
             return View(Db.Friendships
                 .Include(fs => fs.Second)
-                .ThenInclude(s=>s.Image)
+                .ThenInclude(s => s.Image)
                 .Include(fs => fs.Chat)
-                .ThenInclude(c => c.Messages)
-                .ThenInclude(m => m.Sender)
-                .Where(fs=>fs.First == user));
+                .Where(fs => fs.First == user && fs.Chat != null));
         }
     }
 }

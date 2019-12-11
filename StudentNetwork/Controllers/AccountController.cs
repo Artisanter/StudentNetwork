@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using StudentNetwork.Models;
 using StudentNetwork.ViewModels;
 using System;
@@ -17,9 +18,12 @@ namespace StudentNetwork.Controllers
 {
     public class AccountController : ContextController
     {
-        public AccountController(StudentContext context) : base(context)
-        { }
-
+        private readonly IStringLocalizer<HomeController> _localizer;
+        public AccountController(StudentContext context, IStringLocalizer<HomeController> localizer) : base(context)
+        {
+            _localizer = localizer;
+        }
+        [Route("")]
         [Authorize]
         public IActionResult Self()
         {
@@ -27,9 +31,17 @@ namespace StudentNetwork.Controllers
             ViewData["Title"] = student.Name;
             return View(student);
         }
+        [Route("{id}")]
         public IActionResult Index(int id)
         {
-            var student = Db.Students.Include(s => s.Image).First(s => s.Id == id);
+            Student student;
+            if (id == 0)
+            {
+                var login = HttpContext.Request.Path.ToString().Trim('{','}','/');
+                student = Db.Students.Include(s => s.Image).First(s => s.Login == login);
+            }
+            else
+                student = Db.Students.Include(s => s.Image).First(s => s.Id == id);
             ViewData["Title"] = student.Name;
             if (User.Identity.IsAuthenticated)
             {
@@ -65,12 +77,14 @@ namespace StudentNetwork.Controllers
             return View(img);
         }
         [HttpGet]
+        [Route("login")]
         public IActionResult Login()
         {
             return View();
         }
 
         [HttpGet]
+        [Route("edit")]
         [Authorize]
         public async Task<IActionResult> EditUser()
         {
@@ -86,6 +100,7 @@ namespace StudentNetwork.Controllers
         }
 
         [HttpPost]
+        [Route("edit")]
         [Authorize]
         public async Task<IActionResult> EditUser(UserEditModel model)
         {
@@ -122,6 +137,7 @@ namespace StudentNetwork.Controllers
         }
 
         [HttpPost]
+        [Route("login")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginModel model)
         {
@@ -141,11 +157,13 @@ namespace StudentNetwork.Controllers
             return View(model);
         }
         [HttpGet]
+        [Route("signup")]
         public IActionResult Register()
         {
             return View();
         }
         [HttpPost]
+        [Route("signup")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterModel model)
         {

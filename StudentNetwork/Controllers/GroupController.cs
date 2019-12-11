@@ -16,6 +16,7 @@ namespace StudentNetwork.Controllers
         { }
 
         [Authorize]
+        [Route("kek/{id}")]
         public IActionResult Index(int id)
         {
             var student = GetCurrentStudent();
@@ -63,9 +64,16 @@ namespace StudentNetwork.Controllers
                 Role = Db.Roles.First(r => r.Name == "Admin")
             };
             await Db.Groups.AddAsync(group).ConfigureAwait(false);
+            await Db.Memberships.AddAsync(membership).ConfigureAwait(false);
             await Db.SaveChangesAsync().ConfigureAwait(false);
 
             return RedirectToAction("Index", new { group.Id });
+        }
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            return View(new GroupModel());
         }
 
         [Authorize]
@@ -165,6 +173,7 @@ namespace StudentNetwork.Controllers
             return RedirectToAction("AdminView", new { id = groupId });
         }
         [Authorize]
+        [Route("groups")]
         public async Task<IActionResult> List()
         {
             var student = await GetCurrentStudentAsync().ConfigureAwait(false);
@@ -189,6 +198,7 @@ namespace StudentNetwork.Controllers
             return View(groups);
         }
         [Authorize]
+        [Route("mates/{id}")]
         public async Task<IActionResult> Mates(int id)
         {
             var student = await GetCurrentStudentAsync().ConfigureAwait(false);
@@ -204,6 +214,7 @@ namespace StudentNetwork.Controllers
         }
 
         [Authorize]
+        [Route("administration/{id}")]
         public async Task<IActionResult> AdminView(int id)
         {
             ViewBag.GroupId = id;
